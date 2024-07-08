@@ -11,6 +11,6 @@ column_2 = data.iloc[:, 1]
 # Plot
 plt.plot(column_2)
 plt.xlabel('Samples')
-plt.ylabel('Amplitude')
+plt.ylabel('Amplitudes')
 plt.title('Smartwatch PPG')
 plt.show()
