@@ -99,6 +99,8 @@ def extract_number(filename):
 
 # Einfache SNR Berechnung: Alle Frequenzen zwischen Low und High ist Signal, Rest ist Rauschen
 def calc_snr(signal_array, fps, low, high):  # De Haan Methode
+    signal_array = bandpass_filter(signal_array, 0.4, 5, 30)
+
     # Leistungsspektraldichte (PSD) des Signals berechnen
     f, pxx = welch(signal_array, fps, nperseg=len(signal_array))
 
@@ -120,7 +122,7 @@ def calc_snr(signal_array, fps, low, high):  # De Haan Methode
         return snr_db
 
 
-def calc_snr_windowed(signal_array, ref_hand_signal, fps):  # De Haan Methode
+def calc_snr_windowed(signal_array, ref_hand_signal, fps):
     freq_bandwidth = 0.2  # Fensterbreite in Hz um die Herzfrequenz bzw. die Harmonische
     min_freq = 0.9  # Frequenz in Hz, ab der Maximum gesucht wird
     max_freq = 1.6
@@ -185,8 +187,8 @@ def calc_correlation(signal_array, ref_hand_signal):
 def calc_feature(signal, ref_hand_signal, fps, feature):
     if feature == 'SNR':
         signal_array = signal.to_numpy()
-        snr_db = calc_snr_windowed(signal_array, ref_hand_signal, fps=30)
-        # snr_db = calc_snr(signal_array, low=0.8, high=5, fps=30)
+        snr_db = calc_snr_windowed(signal_array, ref_hand_signal, fps=fps)
+        # snr_db = calc_snr(signal_array, low=0.8, high=5, fps=fps)
         return snr_db
     elif feature == 'Corr':
         signal_array = signal.to_numpy()
@@ -312,12 +314,12 @@ window_length = 10                                  # Länge des Signalfensters 
 fps = 30                                            # Framerate der Kamera
 measurement = 'E'                                   # [D: Basline, E: Full Stenosis, F: Medium Stenosis]
 path = f'C:/Users/tauber/Desktop/{measurement}_9'
-feature = 'Corr'                                    # Features = ['SNR', 'Corr', 'HR']
+feature = 'SNR'                                    # Features = ['SNR', 'Corr', 'HR']
 channel = 'g'                                       # channel = ['r', 'g', 'b', 'all']
 
 create_signal_snips = 0  # 0: Signalabschnitte werden nicht erzeugt, 1: Signalabschnitte werden
-calc_features = 0  # 0: Features werden nicht berechnet, 1: Features werden berechnet
-heatmap = 1  # 0: Heatmap wird nicht erstellt, 1: Heatmap wird erstellt
+calc_features = 1  # 0: Features werden nicht berechnet, 1: Features werden berechnet
+heatmap = 0  # 0: Heatmap wird nicht erstellt, 1: Heatmap wird erstellt
 
 if create_signal_snips == 1:
     connect_frames(window=window_length, fps=fps, path=path)
